@@ -19,14 +19,25 @@ export default function Under5MegaShopPage() {
           page: String(page),
           ...(activeCategory && { categoryId: activeCategory })
         });
+
+        // Appended custom timestamp context injection mechanism to burst network distribution caches
+        const res = await fetch(`/api/products/under5?${urlParams.toString()}&_t=${Date.now()}`, { 
+          cache: "no-store" 
+        });
         
-        const res = await fetch(`/api/products/under5?${urlParams.toString()}`);
         if (res.ok) {
           const data = await res.json();
-          setProducts(data.products || []);
+          
+          // Strict real-time safety fallback gatekeeper checking 
+          const cleanStreamData = (data.products || []).filter((p: any) => {
+            const parsedPrice = parseFloat(p.target_sale_price || p.price || "0");
+            return parsedPrice > 0 && parsedPrice <= 4.99;
+          });
+          
+          setProducts(cleanStreamData);
         }
       } catch (err) {
-        console.error("Client side retrieval block error:", err);
+        console.error("Component data processing block failure notice:", err);
       } finally {
         setLoading(false);
       }
@@ -34,23 +45,15 @@ export default function Under5MegaShopPage() {
     loadEngineData();
   }, [activeCategory, page]);
 
-  // ABSOLUTE CLIENT GATEKEEPER: Block any product strictly above $4.99 or junk data right before rendering
-  const strictlyUnder5Products = products.filter((product) => {
-    const price = parseFloat(product.target_sale_price || product.price || "0");
-    return price > 0 && price <= 4.99;
-  });
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 min-h-screen bg-[#fafafa]">
       
-      {/* Structural Node Selector (Category Navigation Grid) */}
+      {/* Dynamic Smooth Layout Segmented Controller Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none mt-2">
         <button
           onClick={() => { setActiveCategory(""); setPage(1); }}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap border flex items-center gap-1.5 ${
-            activeCategory === ""
-              ? "bg-gray-900 text-white border-gray-900 shadow-xs"
-              : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+            activeCategory === "" ? "bg-gray-900 text-white border-gray-900 shadow-xs" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
           }`}
         >
           <Flame size={13} /> Trending Drops
@@ -60,9 +63,7 @@ export default function Under5MegaShopPage() {
             key={cat.id}
             onClick={() => { setActiveCategory(cat.id); setPage(1); }}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap border ${
-              activeCategory === cat.id
-                ? "bg-gray-900 text-white border-gray-900 shadow-xs"
-                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+              activeCategory === cat.id ? "bg-gray-900 text-white border-gray-900 shadow-xs" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
             }`}
           >
             {cat.name}
@@ -70,24 +71,24 @@ export default function Under5MegaShopPage() {
         ))}
       </div>
 
-      {/* Grid Execution Stream */}
-      {strictlyUnder5Products.length === 0 && !loading ? (
-        <div className="text-center py-24 bg-white rounded-2xl border border-gray-200 max-w-md mx-auto">
-          <p className="text-sm font-bold text-gray-800">Recalibrating Under $5 Stream</p>
-          <p className="text-xs text-gray-400 mt-1">Filtering products to guarantee high-value items under $4.99. Try changing the category.</p>
+      {/* Render Node Pipeline Control */}
+      {products.length === 0 && !loading ? (
+        <div className="text-center py-24 bg-white rounded-2xl border border-gray-200 max-w-md mx-auto shadow-xs">
+          <p className="text-sm font-bold text-gray-800">Recalibrating Under $5 Feed</p>
+          <p className="text-xs text-gray-400 mt-1">Sourcing fresh micro-budget inventories. Switch tabs or reset filters.</p>
         </div>
       ) : (
-        <ProductGrid products={strictlyUnder5Products} cols={5} loading={loading} skeletonCount={20} />
+        <ProductGrid products={products} cols={5} loading={loading} skeletonCount={25} />
       )}
 
-      {/* Clean Control Level Pagination */}
-      {!loading && strictlyUnder5Products.length > 0 && (
-        <div className="mt-10">
+      {/* Massive Pagination System (Simulates boundless entries seamlessly) */}
+      {!loading && products.length > 0 && (
+        <div className="mt-12">
           <Pagination 
             currentPage={page} 
-            totalPages={10} 
+            totalPages={150} 
             onPageChange={(p) => { setPage(p); window.scrollTo({ top: 0, behavior: "smooth" }); }} 
-            perPage={50} 
+            perPage={40} 
           />
         </div>
       )}
