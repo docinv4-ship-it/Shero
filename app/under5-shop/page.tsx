@@ -20,7 +20,6 @@ export default function Under5MegaShopPage() {
           ...(activeCategory && { categoryId: activeCategory })
         });
         
-        // FIXED: Removed the incorrect "/app" prefix to perfectly call the core handler route
         const res = await fetch(`/api/products/under5?${urlParams.toString()}`);
         if (res.ok) {
           const data = await res.json();
@@ -34,6 +33,12 @@ export default function Under5MegaShopPage() {
     }
     loadEngineData();
   }, [activeCategory, page]);
+
+  // ABSOLUTE CLIENT GATEKEEPER: Block any product strictly above $4.99 or junk data right before rendering
+  const strictlyUnder5Products = products.filter((product) => {
+    const price = parseFloat(product.target_sale_price || product.price || "0");
+    return price > 0 && price <= 4.99;
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 min-h-screen bg-[#fafafa]">
@@ -66,17 +71,17 @@ export default function Under5MegaShopPage() {
       </div>
 
       {/* Grid Execution Stream */}
-      {products.length === 0 && !loading ? (
+      {strictlyUnder5Products.length === 0 && !loading ? (
         <div className="text-center py-24 bg-white rounded-2xl border border-gray-200 max-w-md mx-auto">
-          <p className="text-sm font-bold text-gray-800">Recalibrating Stream Layers</p>
-          <p className="text-xs text-gray-400 mt-1">The recommendation cluster is processing next-level node maps. Try refreshing.</p>
+          <p className="text-sm font-bold text-gray-800">Recalibrating Under $5 Stream</p>
+          <p className="text-xs text-gray-400 mt-1">Filtering products to guarantee high-value items under $4.99. Try changing the category.</p>
         </div>
       ) : (
-        <ProductGrid products={products} cols={5} loading={loading} skeletonCount={20} />
+        <ProductGrid products={strictlyUnder5Products} cols={5} loading={loading} skeletonCount={20} />
       )}
 
       {/* Clean Control Level Pagination */}
-      {!loading && products.length > 0 && (
+      {!loading && strictlyUnder5Products.length > 0 && (
         <div className="mt-10">
           <Pagination 
             currentPage={page} 
