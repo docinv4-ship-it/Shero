@@ -35,6 +35,7 @@ const NAV_LINKS = [
   { href: "/", icon: Home, label: "Home" },
   { href: "/categories", icon: Grid3X3, label: "All Categories" },
   { href: "/keywords", icon: Zap, label: "Quick Tags" }, // Added to Mobile Drawer Navigation Matrix Loop
+  { href: "/under5-shop", icon: Sparkles, label: "Under $5 Shop" },
   { href: "/browse", icon: Compass, label: "Browse" },
   { href: "/wishlist", icon: Heart, label: "Shopping Boards" },
   { href: "/cart", icon: ShoppingCart, label: "Your Cart" },
@@ -319,13 +320,21 @@ function HeaderSearch() {
             >
               ☰ All
             </Link>
-            
+
             {/* INJECTED HIGHLIGHT: Quick Tags system shortcut applied onto the static bar navigation */}
             <Link
               href="/keywords"
               className="text-white text-xs whitespace-nowrap px-3 py-1.5 rounded-full bg-orange-700 border border-orange-400/20 hover:bg-orange-800 transition-colors font-black flex-shrink-0 animate-pulse flex items-center gap-1"
             >
               ⚡ Quick Tags
+            </Link>
+
+            {/* DEDICATED UNDER $5 HIGH CONVERSION COUPLING LINK */}
+            <Link
+              href="/under5-shop"
+              className="text-yellow-300 text-xs whitespace-nowrap px-3 py-1.5 rounded-full bg-orange-800/80 border border-yellow-400/30 hover:bg-orange-900 transition-colors font-black flex-shrink-0 flex items-center gap-1 shadow-sm"
+            >
+              🎯 Under $5 Shop
             </Link>
 
             {CATEGORIES.slice(0, 10).map((cat: any) => (
