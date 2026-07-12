@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { PREMIUM_CATEGORIES } from "@/lib/aliexpress-under5";
 import ProductGrid from "@/components/ProductGrid";
 import Pagination from "@/components/Pagination";
-import { Sparkles, Terminal, Flame, Layers } from "lucide-react";
+import { Flame } from "lucide-react";
 
 export default function Under5MegaShopPage() {
   const [activeCategory, setActiveCategory] = useState<string>("");
@@ -20,7 +20,8 @@ export default function Under5MegaShopPage() {
           ...(activeCategory && { categoryId: activeCategory })
         });
         
-        const res = await fetch(`/app/api/products/under5?${urlParams.toString()}`);
+        // FIXED: Removed the incorrect "/app" prefix to perfectly call the core handler route
+        const res = await fetch(`/api/products/under5?${urlParams.toString()}`);
         if (res.ok) {
           const data = await res.json();
           setProducts(data.products || []);
@@ -35,41 +36,10 @@ export default function Under5MegaShopPage() {
   }, [activeCategory, page]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 min-h-screen bg-[#fafafa]">
+    <div className="max-w-7xl mx-auto px-4 py-6 min-h-screen bg-[#fafafa]">
       
-      {/* Premium Minimalist Header Block */}
-      <div className="bg-white rounded-2xl p-8 border border-gray-200/80 shadow-xs mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="bg-amber-500/10 text-amber-600 px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
-              <Sparkles size={10} /> Dynamic Value Curation
-            </span>
-            <span className="bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-md text-[10px] font-mono">
-              Pure-Node-Sync
-            </span>
-          </div>
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight">The Edge Shop</h1>
-          <p className="text-xs text-gray-500 mt-1 max-w-lg">
-            High-perceived value tech gear, EDC tools, and premium hardware. Hardcoded and locked under $4.99 using algorithmic sorting pipelines.
-          </p>
-        </div>
-
-        {/* Live Performance Micro Ticker */}
-        <div className="flex items-center gap-4 bg-gray-50 border border-gray-100 p-3 rounded-xl font-mono text-[11px] text-gray-500">
-          <div className="flex items-center gap-1.5">
-            <Layers size={13} className="text-blue-500" />
-            <span>Feeds: <strong className="text-gray-900">Active</strong></span>
-          </div>
-          <div className="w-px h-4 bg-gray-200" />
-          <div className="flex items-center gap-1.5">
-            <Terminal size={13} className="text-emerald-500" />
-            <span>Keyword Overrides: <strong className="text-gray-900">Bypassed</strong></span>
-          </div>
-        </div>
-      </div>
-
       {/* Structural Node Selector (Category Navigation Grid) */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none">
+      <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none mt-2">
         <button
           onClick={() => { setActiveCategory(""); setPage(1); }}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap border flex items-center gap-1.5 ${
