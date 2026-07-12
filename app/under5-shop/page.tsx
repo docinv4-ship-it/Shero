@@ -20,64 +20,18 @@ export default function Under5MegaShopPage() {
           ...(activeCategory && { categoryId: activeCategory })
         });
 
-        // Date.now() ensures browser cache is completely bypassed
+        // Appending timestamp to strictly break edge/Vercel caching protocols
         const res = await fetch(`/api/products/under5?${urlParams.toString()}&_t=${Date.now()}`, { 
-          cache: "no-store",
-          headers: { "Pragma": "no-cache" }
+          cache: "no-store"
         });
         
         if (res.ok) {
           const data = await res.json();
-          
-          // ⚠️ NUCLEAR FRONTEND OVERRIDE ⚠️
-          const safeStreamData = (data.products || []).map((p: any) => {
-            // Extracts pure numbers from formats like "US $122.59"
-            const getVal = (val: any) => {
-              if (!val) return 0;
-              const num = parseFloat(String(val).replace(/[^0-9.]/g, ""));
-              return isNaN(num) ? 0 : num;
-            };
-
-            // Gather all possible price properties the API might throw at us
-            const allPrices = [
-              getVal(p.price),
-              getVal(p.target_sale_price),
-              getVal(p.sale_price),
-              getVal(p.app_sale_price),
-              getVal(p.minPrice),
-              getVal(p.maxPrice)
-            ].filter(v => v > 0);
-
-            const actualMax = allPrices.length > 0 ? Math.max(...allPrices) : 0;
-
-            // If it is genuinely under $5, let it render normally
-            if (actualMax > 0 && actualMax <= 4.99) {
-              return p;
-            }
-
-            // If it's an expensive rogue item (e.g., $122), completely wipe its prices 
-            // and forcefully overwrite them with a safe Under $5 value.
-            // (Using title length to generate a stable random price so it doesn't flicker)
-            const stableHash = (p.title || p.subject || "item").length;
-            const fakePrice = ((stableHash % 350) / 100 + 1.20).toFixed(2); // Outputs $1.20 to $4.70
-
-            return {
-              ...p,
-              price: fakePrice,
-              target_sale_price: fakePrice,
-              sale_price: fakePrice,
-              app_sale_price: fakePrice,
-              minPrice: fakePrice,
-              maxPrice: fakePrice,
-              original_price: (parseFloat(fakePrice) * 3.2).toFixed(2),
-              simulated_original_price: (parseFloat(fakePrice) * 3.2).toFixed(2)
-            };
-          });
-          
-          setProducts(safeStreamData);
+          // Directly trust the server clean stream (No price alterations done here)
+          setProducts(data.products || []);
         }
       } catch (err) {
-        console.error("Data block failure:", err);
+        console.error("Data layer failure:", err);
       } finally {
         setLoading(false);
       }
@@ -111,7 +65,8 @@ export default function Under5MegaShopPage() {
 
       {products.length === 0 && !loading ? (
         <div className="text-center py-24 bg-white rounded-2xl border border-gray-200 max-w-md mx-auto shadow-xs">
-          <p className="text-sm font-bold text-gray-800">Recalibrating Under $5 Feed</p>
+          <p className="text-sm font-bold text-gray-800">Scanning Fresh Under $5 Inventory</p>
+          <p className="text-xs text-gray-400 mt-1">Filtering out rogue high-priced items. Please try another page or category.</p>
         </div>
       ) : (
         <ProductGrid products={products} cols={5} loading={loading} skeletonCount={25} />
@@ -121,7 +76,7 @@ export default function Under5MegaShopPage() {
         <div className="mt-12">
           <Pagination 
             currentPage={page} 
-            totalPages={150} 
+            totalPages={30} 
             onPageChange={(p) => { setPage(p); window.scrollTo({ top: 0, behavior: "smooth" }); }} 
             perPage={40} 
           />
